@@ -1,0 +1,819 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="TyanK">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="操作系统笔记[TOC] 硬件结构1、存储器的结构1.1 CPU内部结构时钟周期看cpu频率，如2GHz，时钟周期为 1&#x2F;2G s &#x3D; 0.5 ns  CPU寄存器 （半个时钟周期） L1 Cache L2 Cache L3 Cache  1.2 内存条 2、如何让CPU运行代码运行地更快1. 提升缓存命中率（L1 Cache） 数据缓存，遍历数据，按照内存布局地顺序操作，就是Cpu Cache L">
+<meta property="og:type" content="article">
+<meta property="og:title" content="后端工程笔记">
+<meta property="og:url" content="http://example.com/2022/10/14/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="后端工程笔记">
+<meta property="og:description" content="操作系统笔记[TOC] 硬件结构1、存储器的结构1.1 CPU内部结构时钟周期看cpu频率，如2GHz，时钟周期为 1&#x2F;2G s &#x3D; 0.5 ns  CPU寄存器 （半个时钟周期） L1 Cache L2 Cache L3 Cache  1.2 内存条 2、如何让CPU运行代码运行地更快1. 提升缓存命中率（L1 Cache） 数据缓存，遍历数据，按照内存布局地顺序操作，就是Cpu Cache L">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E5%B1%82%E6%AC%A1%E5%85%B3%E7%B3%BB%E5%9B%BE.png">
+<meta property="og:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost3@main/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/CPU%E4%BC%AA%E5%85%B1%E4%BA%AB/CPU%E6%9E%B6%E6%9E%84.png">
+<meta property="og:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost3@main/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/CPU%E4%BC%AA%E5%85%B1%E4%BA%AB/%E8%B0%83%E5%BA%A6%E7%B1%BB.png">
+<meta property="og:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/12-TCP%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B.jpg">
+<meta property="og:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/13-UDP%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B.jpg">
+<meta property="og:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B/26-%E5%93%8D%E5%BA%94%E6%AF%94%E5%85%AC%E5%BC%8F.jpg">
+<meta property="og:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B/28-%E5%A4%9A%E7%BA%A7%E9%98%9F%E5%88%97.jpg">
+<meta property="og:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%B5%81%E7%A8%8B.png">
+<meta property="article:published_time" content="2022-10-14T14:03:37.074Z">
+<meta property="article:modified_time" content="2022-06-23T14:46:58.757Z">
+<meta property="article:author" content="TyanK">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E5%B1%82%E6%AC%A1%E5%85%B3%E7%B3%BB%E5%9B%BE.png">
+  
+  
+  
+  <title>后端工程笔记</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Engineer</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                联系我
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text=""></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-10-14 22:03" pubdate>
+          2022年10月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          52 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none"></h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="操作系统笔记"><a href="#操作系统笔记" class="headerlink" title="操作系统笔记"></a>操作系统笔记</h1><p>[TOC]</p>
+<h1 id="硬件结构"><a href="#硬件结构" class="headerlink" title="硬件结构"></a>硬件结构</h1><h2 id="1、存储器的结构"><a href="#1、存储器的结构" class="headerlink" title="1、存储器的结构"></a>1、存储器的结构</h2><h3 id="1-1-CPU内部结构"><a href="#1-1-CPU内部结构" class="headerlink" title="1.1 CPU内部结构"></a>1.1 CPU内部结构</h3><p>时钟周期看cpu频率，如2GHz，时钟周期为 1/2G s = 0.5 ns</p>
+<ul>
+<li>CPU寄存器 （半个时钟周期）</li>
+<li>L1 Cache</li>
+<li>L2 Cache</li>
+<li>L3 Cache</li>
+</ul>
+<h3 id="1-2-内存条"><a href="#1-2-内存条" class="headerlink" title="1.2 内存条"></a>1.2 内存条</h3><h3 id=""><a href="#" class="headerlink" title=""></a></h3><p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/%E5%AD%98%E5%82%A8%E5%99%A8%E7%9A%84%E5%B1%82%E6%AC%A1%E5%85%B3%E7%B3%BB%E5%9B%BE.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="2、如何让CPU运行代码运行地更快"><a href="#2、如何让CPU运行代码运行地更快" class="headerlink" title="2、如何让CPU运行代码运行地更快"></a>2、如何让CPU运行代码运行地更快</h2><h3 id="1-提升缓存命中率（L1-Cache）"><a href="#1-提升缓存命中率（L1-Cache）" class="headerlink" title="1. 提升缓存命中率（L1 Cache）"></a>1. 提升缓存命中率（L1 Cache）</h3><ul>
+<li>数据缓存，遍历数据，按照内存布局地顺序操作，就是Cpu Cache Line 在从内存中读取数据的时候，由于需要读满，就会把当前内容之后的能够填满空间的数据量一并载入Cpu Cache中，之后的一些读数据就可以从CPU Cache中读到，而不用去内存中读。</li>
+<li>指令缓存，让分支预测器发挥它的作用，尽量有规律一些。</li>
+</ul>
+<h2 id="3、CPU缓存一致性"><a href="#3、CPU缓存一致性" class="headerlink" title="3、CPU缓存一致性"></a>3、CPU缓存一致性</h2><p>在多核CPU中需要考虑到缓存的一致性</p>
+<blockquote>
+<p>对于数据的写入，CPU 都会先写入到 Cache 里面，然后再在找个合适的时机写入到内存，那就有「写直达」和「写回」这两种策略来保证 Cache 与内存的数据一致性：</p>
+<ul>
+<li>写直达，只要有数据写入，都会直接把数据写入到内存里面，这种方式简单直观，但是性能就会受限于内存的访问速度；</li>
+<li>写回，对于已经缓存在 Cache 的数据的写入，只需要更新其数据就可以，不用写入到内存，只有在需要把缓存里面的脏数据交换出去的时候，才把数据同步到内存里，这种方式在缓存命中率高的情况，性能会更好；</li>
+</ul>
+</blockquote>
+<h3 id="3-1-实现缓存一致性"><a href="#3-1-实现缓存一致性" class="headerlink" title="3.1 实现缓存一致性"></a>3.1 实现缓存一致性</h3><p>实现缓存一致性需要满足两点</p>
+<ul>
+<li>写传播，即是一个CPU的核中CPU Cache在发生写操作时，将这个操作通过总线传播给其他核心</li>
+<li>事务的串行化，传播出去了，当然要考虑执行顺序，不然会导致不同核心收到的顺序不同，导致数据不一致，所以需要保证事物的串行化，程序在不同核心上运行的结果才会一致。</li>
+</ul>
+<p>解决方案：</p>
+<p><strong>基于总线嗅探机制的MESI协议</strong></p>
+<ul>
+<li><p>总线嗅探：</p>
+<ul>
+<li>当一个CPU核心修改了L1 Cache中的一个值，会通过总线广播告知其他核心，其他核心则会一致监听总线上的广播事件，然后其他cpu核心会检查自己的L1 Cache中有没有这个变量，有的话就要修改更新。</li>
+<li>这种方法不能保证事务的串行化。</li>
+</ul>
+</li>
+<li><p>MESI协议</p>
+<ul>
+<li><em>Modified</em>，已修改<ul>
+<li>这个状态就是脏数据，即以前已经修改过了，但是还没有写入内存</li>
+</ul>
+</li>
+<li><em>Exclusive</em>，独占<ul>
+<li>表示当前数据只被一个核心拥有，该核心可以对当前数据做任何修改而不用通过总线传播给其他核心</li>
+</ul>
+</li>
+<li><em>Shared</em>，共享<ul>
+<li>表示当前的数据为多个核心拥有，当一个核心想要修改这个数据的时候，需要先向其他CPU核心广播一个请求，让其他核心先把它们Cache中的此数据标记为失效状态，然后再更新当前的数据</li>
+</ul>
+</li>
+<li><em>Invalidated</em>，已失效<ul>
+<li>表示当前Cache Block里的数据已经失效，不可以读取该状态的数据</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>所以，可以发现当 Cache Line 状态是「已修改」或者「独占」状态时，修改更新其数据不需要发送广播给其他 CPU 核心，这在一定程度上减少了总线带宽压力。</p>
+</blockquote>
+<h2 id="4、CPU如何执行任务"><a href="#4、CPU如何执行任务" class="headerlink" title="4、CPU如何执行任务"></a>4、CPU如何执行任务</h2><h3 id="4-1-CPU结构"><a href="#4-1-CPU结构" class="headerlink" title="4.1 CPU结构"></a>4.1 CPU结构</h3><p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost3@main/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/CPU%E4%BC%AA%E5%85%B1%E4%BA%AB/CPU%E6%9E%B6%E6%9E%84.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h3 id="4-2、CPU选择线程"><a href="#4-2、CPU选择线程" class="headerlink" title="4.2、CPU选择线程"></a>4.2、CPU选择线程</h3><p>Linux中任务分为 <strong>普通任务</strong> 和 <strong>实时任务</strong> </p>
+<ul>
+<li>实时任务：对系统响应要求很高，要尽快完成任务，所以优先级很高，在0-99范围内</li>
+<li>普通任务：对响应时间没有要求，优先级在100-139内</li>
+</ul>
+<h4 id="调度类"><a href="#调度类" class="headerlink" title="调度类"></a>调度类</h4><p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost3@main/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/CPU%E4%BC%AA%E5%85%B1%E4%BA%AB/%E8%B0%83%E5%BA%A6%E7%B1%BB.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<ul>
+<li>Deadline 和 Realtime 调度类都是实时任务的，有三种调度策略<ul>
+<li>Sched_DeadLine 这种调度会让靠近当前时间点的deadline任务优先调度</li>
+<li>SCHED_FIFO 优先级相同的任务应用先来先服务，优先级更高的任务可以抢占优先级低的任务，即插队</li>
+<li>SCHED_RR  优先级相同的任务轮流执行，时间片用完的任务进入队尾等待轮到自己，优先级高的也可以抢占</li>
+</ul>
+</li>
+<li>Fair 用于普通任务<ul>
+<li>SCHED_NORMAL普通任务调度</li>
+<li>SCHED_BATCH 后台任务调度，不和终端进行交互，可以降低其优先级。</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-3、CFS-完全公平调度（针对普通任务）"><a href="#4-3、CFS-完全公平调度（针对普通任务）" class="headerlink" title="4.3、CFS 完全公平调度（针对普通任务）"></a>4.3、CFS 完全公平调度（针对普通任务）</h3><p>理念：想让分配给每个任务的CPU时间是一样的，所以就给每个任务都加一个虚拟运行时间 vruntime，一个任务运行的越久 vruntime越大，然而CFS调度的时候，优先调度vruntime小任务，就跟分水喝一样，运行时间短的任务当然要多分配点时间给它，这样才能打到比较公平的对待。</p>
+<p><strong>计算vruntime公式： vruntime += 实际运行时间 * nice / 权重</strong></p>
+<p>nice 级别越低，权重越大，那么权重越大，vruntime就越小，就会被优先执行。</p>
+<p>任务nice值的分布范围 -20 ~ 19 ，nice不是表示优先级，而是表示对优先级的修正量， 与优先级的关系 </p>
+<p><strong>priority（new） = priority（old） + nice</strong>，这样看nice值越小（为负），优先级越高，优先级范围是 0<del>139 其中 0</del>99 是实时任务使用，100~139 是普通任务使用，所以nice值调整的是普通任务的优先级。想要让一个普通任务优先执行可以调整他的nice值，</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash">//在启动任务的时候调整：<br>$ <span class="hljs-built_in">nice</span> -n -3 /usr/sbin/mysqld<br>//任务运行时调整<br>$ renice -10 -p &lt;进程PID&gt;<br></code></pre></td></tr></table></figure>
+
+<h2 id="5、进程的通信"><a href="#5、进程的通信" class="headerlink" title="5、进程的通信"></a>5、进程的通信</h2><h3 id="5-1、进程的通信方式"><a href="#5-1、进程的通信方式" class="headerlink" title="5.1、进程的通信方式"></a>5.1、进程的通信方式</h3><ul>
+<li>管道</li>
+<li>消息队列</li>
+<li>共享内存</li>
+<li>信号量</li>
+<li>信号</li>
+<li>Socket</li>
+</ul>
+<h4 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h4><p>内核里的一段缓存，写入数据实际写入内存，读也是从内存读取，</p>
+<p>Linux 命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ A | B<br></code></pre></td></tr></table></figure>
+
+<p>数据传输是单向的，如果要实现双向通信就要建立两个管道，**|** 这个符号是匿名管道，要建立命名管道</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ <span class="hljs-built_in">mkfifo</span> mypipe<br></code></pre></td></tr></table></figure>
+
+<p>写入数据和读取数据是分开的，读完之后就会销毁管道，通信效率很低，不适合频繁通信。匿名管道依赖于父子进程的关系，命名管道则不依赖，数据遵循先进先出。</p>
+<h4 id="消息队列"><a href="#消息队列" class="headerlink" title="消息队列"></a>消息队列</h4><p>保存在内存中的消息链表</p>
+<p>A 进程把数据放在消息队列里，B进程自己去消息队列中取出，可以双向，发送出的数据是一个个消息体，消息体是用户自定义的数据类型，发送方和接收方约定好数据类型，消息体是固定大小的存储块，消息块一旦被读取，在内存中便会被删除，不主动释放消息队列，或者关闭操作系统，消息队列会一直存在。但是由于消息队列是存储在内核中，所以写入和读出都会产生用户态和内核态之间的数据拷贝开销。</p>
+<h4 id="共享内存"><a href="#共享内存" class="headerlink" title="共享内存"></a>共享内存</h4><p>共享内存解决了用户态和内核态之间消息拷贝的问题，进程中的虚拟空间指向的物理地址是相同的，所以就直接存取，不需要传来传去。</p>
+<h4 id="信号量"><a href="#信号量" class="headerlink" title="信号量"></a>信号量</h4><h4 id="信号"><a href="#信号" class="headerlink" title="信号"></a>信号</h4><h4 id="Socket"><a href="#Socket" class="headerlink" title="Socket"></a>Socket</h4><ul>
+<li>实现 TCP 字节流通信： socket 类型是 AF_INET 和 SOCK_STREAM；</li>
+<li>实现 UDP 数据报通信：socket 类型是 AF_INET 和 SOCK_DGRAM；</li>
+<li>实现本地进程间通信： 「本地字节流 socket 」类型是 AF_LOCAL 和 SOCK_STREAM，「本地数据报 socket 」类型是 AF_LOCAL 和 SOCK_DGRAM。另外，AF_UNIX 和 AF_LOCAL 是等价的，所以 AF_UNIX 也属于本地 socket；</li>
+</ul>
+<p>针对TCP协议通信的Socket</p>
+<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/12-TCP%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B.jpg" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p>针对UDP通信的Socket模型</p>
+<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1/13-UDP%E7%BC%96%E7%A8%8B%E6%A8%A1%E5%9E%8B.jpg" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p><strong>Socket 本地和远程通信的区别</strong></p>
+<ul>
+<li><p><strong>本地Socket</strong>  首先，本地Socket编程接口和ipv4，ipv6套接字编程接口一样，但是本地的数据报和字节流要比前两者实现效率更高。</p>
+<p>其次就是本地Socket在bind的时候不需要绑定ip和端口，绑定的是一个本地文件。</p>
+</li>
+<li><p>远程Socket需要绑定ip和端口，并且依赖于TCP或者UDP。</p>
+</li>
+</ul>
+<h2 id="6、进程调度、页面置换、磁盘调度算法"><a href="#6、进程调度、页面置换、磁盘调度算法" class="headerlink" title="6、进程调度、页面置换、磁盘调度算法"></a>6、进程调度、页面置换、磁盘调度算法</h2><h3 id="1、进程调度算法"><a href="#1、进程调度算法" class="headerlink" title="1、进程调度算法"></a>1、进程调度算法</h3><ul>
+<li>非抢占式调度（运行 -&gt; 等待，运行 -&gt; 终止）</li>
+<li>抢占式调度 （运行 -&gt; 就绪，就绪 -&gt; 运行）</li>
+</ul>
+<p><strong>先来先服务调度算法</strong></p>
+<p>​    非抢占式，维持一个队列，每次从就绪队列选择最先进入的进程，然后一直运行直到退出或者被阻塞，才会继续进行下一个进程。</p>
+<p>有利于长作业，适合CPU繁忙型，不适合I/O 繁忙型。</p>
+<p><strong>最短作业优先算法</strong></p>
+<p>​    抢占式，优先运行运行时间最短的进程，对于长作业不利，适合于高吞吐量的系统。</p>
+<p><strong>高响应比优先算法</strong></p>
+<p>​    权衡短作业与长作业，每次进程调度前先算号响应优先级，公式如下：</p>
+<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B/26-%E5%93%8D%E5%BA%94%E6%AF%94%E5%85%AC%E5%BC%8F.jpg" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p>优先运行高响应优先级的进程，服务时间一样，等待时间越长优先级越高，等待时间一样，运行时间越短优先级越高。</p>
+<p><strong>时间片轮转调度算法</strong></p>
+<p>​    每个进程分配一个时间片，时间片用完则保存当前CPU状态，释放进程，进程上下文切换，把CPU分配给其他进程。如果在时间片用完之前就完成了进程，则立马释放CPU。</p>
+<p><strong>最高优先级调度算法</strong></p>
+<p>​    从就绪队列中选择优先级最高的进程运行。优先级分为静态和动态优先级。</p>
+<ul>
+<li>静态优先级：一开始就分配好的优先级，不会改变。</li>
+<li>动态优先级：随着时间推移增加进程的优先级。</li>
+</ul>
+<p><strong>多级反馈队列调度算法</strong></p>
+<p>​    有多个队列，队列优先级从高到低，优先级越高时间片越短。</p>
+<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B/28-%E5%A4%9A%E7%BA%A7%E9%98%9F%E5%88%97.jpg" srcset="/img/loading.gif" lazyload alt="多级反馈队列"></p>
+<p>短作业优先级高会很快被处理完，所以时间片也短，如果高优先级队列的一个进程时间片用完了还没结束，就往下走到下一个队列的尾部，但同时时间片也会增加，算是一种权衡弥补。可以同时兼顾好长短作业，有较好的响应时间。</p>
+<h3 id="2、页面置换算法"><a href="#2、页面置换算法" class="headerlink" title="2、页面置换算法"></a>2、页面置换算法</h3><p>​    缺页中断，当进程要从也内存中取数据，然后就去内存中查页表，发现页表中要查的那个页面失效了，则会发起缺页中断，去磁盘中查找该页面。查到之后，不同于其它中断直接执行下一个指令，缺页中断还是会重新执行这个指令。</p>
+<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost2/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/%E8%B0%83%E5%BA%A6%E7%AE%97%E6%B3%95/%E8%99%9A%E6%8B%9F%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%B5%81%E7%A8%8B.png" srcset="/img/loading.gif" lazyload alt="虚拟内存的流程"></p>
+<p><strong>最佳页面置换算法</strong></p>
+<p>​    这个算法只在理论中存在，并不能实现，因为需要知道未来页面访问的时间，选择未来最长时间不访问的页面。所以这个算法就作为衡量一个算法的效率。</p>
+<p><strong>先进先出置换算法</strong></p>
+<p>​    选择在内存中滞留时间很长的页面进行替换，最简单的，但性能并不是很好。</p>
+<p><strong>最近最久未使用页面置换算法</strong></p>
+<p>​    发生缺页时，选择最长时间没有访问的页面进行置换，不常用，虽然 LRU 在理论上是可以实现的，但代价很高。为了完全实现 LRU，需要在内存中维护一个所有页面的链表，最近最多使用的页面在表头，最近最少使用的页面在表尾。每次访问都需要更新这个链表</p>
+<p><strong>时钟页面置换算法</strong></p>
+<p>​    维持一个环形链表，类似于LRU算法，形如一个时钟，时针指向最老的页面，每个页面维持一个访问位，如果时针指向的页面的访问位为0，则置换这个页面，如果不是0，就访问位减一，时针指向下一个页面。</p>
+<p><strong>最不常用算法</strong></p>
+<p>需要为每个增加一个访问计数器，选择访问次数最少的页面进行只换，硬件上实现成本高。</p>
+<h3 id="3、磁盘调度算法"><a href="#3、磁盘调度算法" class="headerlink" title="3、磁盘调度算法"></a>3、磁盘调度算法</h3><p><strong>先来先服务 <a target="_blank" rel="noopener" href="https://xiaolincoding.com/os/5_schedule/schedule.html#%E5%85%88%E6%9D%A5%E5%85%88%E6%9C%8D%E5%8A%A1">先来先服务</a></strong></p>
+<p><strong>最短寻道优先 <a target="_blank" rel="noopener" href="https://xiaolincoding.com/os/5_schedule/schedule.html#%E6%9C%80%E7%9F%AD%E5%AF%BB%E9%81%93%E6%97%B6%E9%97%B4%E4%BC%98%E5%85%88">最短寻道时间优先</a></strong></p>
+<p><strong>扫描算法 <a target="_blank" rel="noopener" href="https://xiaolincoding.com/os/5_schedule/schedule.html#%E6%89%AB%E6%8F%8F%E7%AE%97%E6%B3%95">扫描算法</a></strong></p>
+<p><strong>循环扫描算法 <a target="_blank" rel="noopener" href="https://xiaolincoding.com/os/5_schedule/schedule.html#%E5%BE%AA%E7%8E%AF%E6%89%AB%E6%8F%8F%E7%AE%97%E6%B3%95">循环扫描算法</a></strong></p>
+<p><strong>LOOK 与C-LOOK <a target="_blank" rel="noopener" href="https://xiaolincoding.com/os/5_schedule/schedule.html#look-%E4%B8%8E-c-look%E7%AE%97%E6%B3%95">LOOK C-LOOK</a></strong> </p>
+<h2 id="7、Reactor-和-Proactor-高性能网络模式"><a href="#7、Reactor-和-Proactor-高性能网络模式" class="headerlink" title="7、Reactor 和 Proactor 高性能网络模式"></a>7、Reactor 和 Proactor 高性能网络模式</h2><h4 id="Reactor使用的是非阻塞同步网络模式："><a href="#Reactor使用的是非阻塞同步网络模式：" class="headerlink" title="Reactor使用的是非阻塞同步网络模式："></a>Reactor使用的是非阻塞同步网络模式：</h4><p>感知可以读写的事件</p>
+<h4 id="Proactor用的是异步网络模式："><a href="#Proactor用的是异步网络模式：" class="headerlink" title="Proactor用的是异步网络模式："></a>Proactor用的是异步网络模式：</h4><p>感知已完成读写的事件。</p>
+<p><strong>Reactor 可以理解为「来了事件操作系统通知应用进程，让应用进程来处理」</strong>，而 <strong>Proactor 可以理解为「来了事件操作系统来处理，处理完再通知应用进程」</strong></p>
+<h2 id="8、I-O-操作"><a href="#8、I-O-操作" class="headerlink" title="8、I/O 操作"></a>8、I/O 操作</h2><ul>
+<li>阻塞</li>
+<li>非阻塞</li>
+<li>同步</li>
+<li>异步</li>
+</ul>
+<h2 id="9、杂谈"><a href="#9、杂谈" class="headerlink" title="9、杂谈"></a>9、杂谈</h2><p>记录一些复盘出的不知道的东西。</p>
+<p>32位CPU 一次计算 4 字节，64位一次计算 8 字节，32、64位为CPU的位宽。</p>
+<p>冯诺依曼体系结构：运算器，存储器，控制器，输入设备，输出设备。</p>
+<p>CPU寄存器，通用寄存，程序计数寄存，指令寄存器。</p>
+<p>指令的内容到机器层面其实就是一串二进制的机器码，需要解析机器码，解析就要依赖CPU指令集，指令的解码。</p>
+<p>CPU流水线，通常分为四个阶段，取得指令，指令译码，执行指令，数据回写。</p>
+<p>程序CPU执行时间 = CPU时钟周期数 * 时钟周期时间（硬件决定）。</p>
+<p>CPU寄存器采用的是SRAM 静态随机存储，内存用的是DRAM 动态随机存储（电容需要不断刷新），L1,L2 Cache 为cpu每个核心拥有，L3 多个核心公用。</p>
+<p>Linux中进程和线程都是用 ==task_struct== 结构体表示，线程的结构体中部分资源是共享的进程资源。</p>
+<p>中断分为硬中断和软中断，即为上半部分和下半部分，例如一个网卡收到网络包，触发硬件中断，把网卡中的数据存入内存中，然后在通知处理程序，进行下一阶段，软中断，处理一些复杂耗时的事务。</p>
+<p>内存分段存在问题：内存碎片，外部内存碎片用内存交换，重置一下物理地址的空间，然后写入的时候就接着上一个内存物理地址下去。</p>
+<p>内存交换的效率就太低了，因为是在硬盘上读写数据。</p>
+<p>内存分页，虚拟和物理空间都切成一个固定的大小，就解决了内存碎片问题。</p>
+<p>malloc分配的是虚拟内存，有两种情况，需要分配的内存小于128kB，用brk() 分配，即移动用户空间堆顶的指针，大于128kb的时候用mmaps() 在文件映射区分配。</p>
+<p>操作系统为什么要内存管理和虚拟内存？</p>
+<p>每个进程都有自己的页表，每个进程的虚拟空间都是私有的且相互独立的，可以解决多线程之间的地址冲突问题。</p>
+<p>页表里的页表项除了地址之外，还有控制一个页的读写权限，标记该页是否存在，为内存访问提供更高的安全性。</p>
+<p>内存分配的过程，应用程序用malloc函数申请内存，当程序读写了这块内存，CPU会访问这个虚拟内存，发现还没有映射到物理内存，就会触发缺页中断，进程从用户态切换到内核态，然后交给缺页中断函数处理，建立起虚拟内存和物理内存的映射。如果内存够的话就直接建立映射，不够的话就会进行内存回收。</p>
+<p>内存回收分类：</p>
+<ul>
+<li>后台内存回收，物理内存紧张会唤醒kswapd 内核线程来回收内存，这个过程是异步的，不会阻塞进程进行。</li>
+<li>直接内存回收，异步回收更不上进程内存申请的速度，就会开始直接回收，这个过程是同步的，也就是会阻塞进程执行。</li>
+</ul>
+<p>文件页和匿名页：</p>
+<p>文件页是内核缓存的文件数据，都有对应的磁盘文件，所以回收的时候直接释放就行，前提是干净页，如果是脏页就得先写回到磁盘中，再释放。</p>
+<p>匿名页就是没有实际载体的数据，所以在swap的时候就需要一个磁盘载体来保存匿名页，就是swap分区。</p>
+<p>内存回收的swap机制，就是将很长一段时间没有访问的内存临时保存到磁盘中，然后释放掉这部分的内存，当那些程序需要运行的时候，再从磁盘恢复数据到内存中。</p>
+<p>如果空闲的物理内存还不满足内存申请的大小，就会触发OOM机制，选择一些占用物理内存较高的进程杀死，释放内存资源，如果不够继续杀进程，直到有足够的内存分配。</p>
+<p>OOM的算法是怎样的：使用的是内核的一个函数 oom_badness()，把系统中可以杀掉的进程全部扫描一遍并且打分，分数越高的进程月先被杀死，分数如何计算: </p>
+<ol>
+<li><p>进程已经使用的内存页面数 process_pages</p>
+</li>
+<li><p>每个进程的校准值，oom_score_adj，可以自行配置在 -1000 ~ 1000之间任意一个数值，计算公式如下</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c">points = process_pages + oom_score_adj*totalpages/<span class="hljs-number">1000</span><br></code></pre></td></tr></table></figure></li>
+</ol>
+<p>如果想让一个线程如论如何也杀不死，就把他的校准值改成 -1000，一般都是很重要的系统服务配置为-1000，不建议将用户程序配置为-1000。    </p>
+<p>进程的挂起状态就是不占用实际的物理内存的情况，与阻塞不同，阻塞中的进程还是占用着内存的，挂起即页表换出存入硬盘中。</p>
+<p>PCB进程唯一的标识，PCB内涵了进程标识符，用户标识符，CPU信息（用于上下文切换），资源分配清单，进程控制和管理信息。</p>
+<p>CPU上下文就是CPU寄存器和程序计数器的环境，进程的切换需要这两者的支持。</p>
+<p>进程上下文切换一般发生在：进程时间片用完，进程等待资源进入挂起状态，进程sleep函数，进程优先级抢占，硬件中断。</p>
+<p>用户线程是由用户级线程库函数管理的，操作系统不参与。</p>
+<p>Linux 一切皆文件，文件的存储方式有顺序存储，链式存储，索引存储。</p>
+<ul>
+<li>顺序存储，定长，存取速度快，但是又内存碎片，文件不易扩展。</li>
+<li>链式存储，无外部碎片，可以动态扩展，只能按照指针顺序读取，指针消耗空间</li>
+<li>索引存储，可以随机访问，易于文件增删，索引表消耗空间</li>
+</ul>
+<p>空闲空间管理，</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div></div>
+      <div>http://example.com/2022/10/14/操作系统笔记/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>TyanK</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年10月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/10/14/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%AC%94%E8%AE%B0/" title="">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/10/14/MySQL%E9%9D%A2%E8%AF%95/" title="">
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

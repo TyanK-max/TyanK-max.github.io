@@ -1,0 +1,712 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="TyanK">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="MySQL 45讲笔记1、日志系统有点像redis的日志。 更新操作。 redo log：​    这个日志会把更新的操作写入日志，在系统空闲的时候才更新到磁盘，如果每次更新都写入磁盘的话，io代价太大了，所以先写日志，再写磁盘。redo log是固定大小，结构类似于循环链表，可以这么解释，类似于双指针在链表上遍历，一个指针是write pos ，一个是checkpoint，writepos在前面">
+<meta property="og:type" content="article">
+<meta property="og:title" content="后端工程笔记">
+<meta property="og:url" content="http://example.com/2022/10/14/MySQL%E9%9D%A2%E8%AF%95/index.html">
+<meta property="og:site_name" content="后端工程笔记">
+<meta property="og:description" content="MySQL 45讲笔记1、日志系统有点像redis的日志。 更新操作。 redo log：​    这个日志会把更新的操作写入日志，在系统空闲的时候才更新到磁盘，如果每次更新都写入磁盘的话，io代价太大了，所以先写日志，再写磁盘。redo log是固定大小，结构类似于循环链表，可以这么解释，类似于双指针在链表上遍历，一个指针是write pos ，一个是checkpoint，writepos在前面">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="c:/Users/TyanK/AppData/Roaming/Typora/typora-user-images/image-20220519154435476.png">
+<meta property="og:image" content="c:/Users/TyanK/AppData/Roaming/Typora/typora-user-images/image-20220519155013599.png">
+<meta property="og:image" content="c:/Users/TyanK/AppData/Roaming/Typora/typora-user-images/image-20220523155606625.png">
+<meta property="og:image" content="c:/Users/TyanK/AppData/Roaming/Typora/typora-user-images/image-20220523160435387.png">
+<meta property="og:image" content="c:/Users/TyanK/AppData/Roaming/Typora/typora-user-images/image-20220523164000656.png">
+<meta property="article:published_time" content="2022-10-14T14:03:33.108Z">
+<meta property="article:modified_time" content="2022-10-03T03:13:29.458Z">
+<meta property="article:author" content="TyanK">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="c:/Users/TyanK/AppData/Roaming/Typora/typora-user-images/image-20220519154435476.png">
+  
+  
+  
+  <title>后端工程笔记</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Engineer</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                联系我
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text=""></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-10-14 22:03" pubdate>
+          2022年10月14日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          40 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none"></h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="MySQL-45讲笔记"><a href="#MySQL-45讲笔记" class="headerlink" title="MySQL 45讲笔记"></a>MySQL 45讲笔记</h1><h2 id="1、日志系统"><a href="#1、日志系统" class="headerlink" title="1、日志系统"></a>1、日志系统</h2><p>有点像redis的日志。</p>
+<p>更新操作。</p>
+<h3 id="redo-log："><a href="#redo-log：" class="headerlink" title="redo log："></a>redo log：</h3><p>​    这个日志会把更新的操作写入日志，在系统空闲的时候才更新到磁盘，如果每次更新都写入磁盘的话，io代价太大了，所以先写日志，再写磁盘。redo log是固定大小，结构类似于循环链表，可以这么解释，类似于双指针在链表上遍历，一个指针是write pos ，一个是checkpoint，writepos在前面写，checkpoint在后面追，并且更新里面的日志内容到磁盘中。当写指针到末端时，可以循环到开头再继续写，这样子作用下去，如果writepos快赶上checkpoint了，就要推进checkpoint，让writepos停下来不执行新的更新命令。</p>
+<p><img src="C:\Users\TyanK\AppData\Roaming\Typora\typora-user-images\image-20220519154435476.png" srcset="/img/loading.gif" lazyload alt="image-20220519154435476"></p>
+<p>readlog保证数据库异常重启之前提交的记录不会丢失，这个称为crash-safe。</p>
+<h3 id="binlog："><a href="#binlog：" class="headerlink" title="binlog："></a>binlog：</h3><p>server层的日志，因为一开始mysql没用InnoDB，就用这个binlog来做归档。与read log的区别。</p>
+<p><img src="C:\Users\TyanK\AppData\Roaming\Typora\typora-user-images\image-20220519155013599.png" srcset="/img/loading.gif" lazyload alt="image-20220519155013599"></p>
+<h3 id="两阶段提交"><a href="#两阶段提交" class="headerlink" title="两阶段提交"></a>两阶段提交</h3><p>​    提交readlog的过程分为俩阶段，一个是数据更新至内存之后的写入readlog，状态变为prepare，然后在写入server层的binlog，在最后做事务提交，为了保证这俩日志逻辑上的一致，如果不使用这种提交，就会造成一些问题，比如在readlog提交完之后数据库异常重启，就会导致还没写入binlog，如果要做临时库的话，由于binlog不一样，就会导致与原库的值不同。若是先提交binlog，然后crash，还没写入readlog，这样异常重启的时候，由于没写入readlog按理这个事务是无效的，但是binlog里又有，就多了一个事务，恢复数据之后又与原库不同。</p>
+<h3 id="主从复制实现："><a href="#主从复制实现：" class="headerlink" title="主从复制实现："></a>主从复制实现：</h3><p>一般主服务器用来写，从服务器用来读。</p>
+<p>MySQL数据库主从复制的实现依赖于binlog，在主服务器上用binlog记录改变了数据的语句，然后从服务器的io线程负责从主服务器上拉取binlog内容，然后放到自己的relay log（从服务器的中继日志）中，最后从服务器中再执行realy log中的语句，使得主从服务器中的数据保持一致。</p>
+<h2 id="2、事务隔离"><a href="#2、事务隔离" class="headerlink" title="2、事务隔离"></a>2、事务隔离</h2><p>有四种隔离级别：</p>
+<ul>
+<li><p>READ_UNCOMMITTED 读未提交</p>
+<ul>
+<li>一个事务还没提交的时候，它的变更能被其他事务看见，会有脏读情况。</li>
+</ul>
+</li>
+<li><p>READ_COMMITTED 读提交</p>
+<ul>
+<li>一个事务提交之后，它的变更才能被其他事物看见，会有不可重复读情况。</li>
+</ul>
+</li>
+<li><p>REPEATABLE_READ 可重复读</p>
+<ul>
+<li>一个事务在执行的过程中，它看见的数据跟它在启动时看到的数据是一致的，也是提交之后才能被其他事物看见，会有幻读情况。</li>
+</ul>
+</li>
+<li><p>SERIALIZABLE 串行化</p>
+<ul>
+<li>每次读、写都要加锁，读写冲突时必须等前一个事务完成再接着执行。</li>
+</ul>
+</li>
+</ul>
+<p><strong>不宜使用长事务</strong>，会导致回滚日志占用了太多的空间。</p>
+<p>一般都让autocommit = 1，这样就不会出现长事务，如果怕多个短事务开始这样多次的交互造成资源浪费，可以一开始用begin开始事务，后面使用 commit work and chain语法。</p>
+<h2 id="3、索引"><a href="#3、索引" class="headerlink" title="3、索引"></a>3、索引</h2><p>索引常见模型：哈希表，有序数组，B+树。</p>
+<p>哈希表Key—Value，适合等值查询，但是对于范围查询效率很低。</p>
+<p>有序数组：在等值查询和范围查询都很优秀，但是插入数据效率很低，适合长期不更改的静态表。</p>
+<p>B+树：N叉搜索树。</p>
+<h4 id="innoDB-索引"><a href="#innoDB-索引" class="headerlink" title="innoDB 索引"></a>innoDB 索引</h4><p>innoDB中的索引使用B+树，一个索引对应一个B+树，索引分为主键索引（聚簇索引），非主键索引（二级索引）。在二级索引上的查找最终还是会跳到主键索引中，主键索引中储存了对象所有信息，所以二级索引的查找需要多扫描一颗B+树。</p>
+<h4 id="索引维护"><a href="#索引维护" class="headerlink" title="索引维护"></a>索引维护</h4><p>B+树维护索引的有序性，插入新值的时候会有些麻烦，所以一般使用非业务字段做主键并且自增，维护有序性，都是追加操作，不会挪动其他记录。</p>
+<h4 id="覆盖索引"><a href="#覆盖索引" class="headerlink" title="覆盖索引"></a>覆盖索引</h4><p>例如在二级索引上查找一行，如果此时查找的是二级索引自身就带有的值，那么就不需要回到聚簇索引去找，这就叫覆盖索引。</p>
+<h4 id="联合索引"><a href="#联合索引" class="headerlink" title="联合索引"></a>联合索引</h4><p>对表中的多了个建立索引，<strong>有一个最左前缀原则</strong>,找到符合条件的第一个数据。</p>
+<p>建立联合索引如何安排索引内字段排序？</p>
+<p>如果通过调整顺序能够少维护一个索引，那么这个顺序需要优先考虑采用。如果没办法少维护一个索引，那么就联合多个字段，让字段内存小的单独再作为一个单独索引。</p>
+<h4 id="索引下推"><a href="#索引下推" class="headerlink" title="索引下推"></a>索引下推</h4><p>联合索引时，如果索引中的某一个联合字段不符合查找条件，那么将不会回表查询，这样减少回表次数。</p>
+<p><img src="C:\Users\TyanK\AppData\Roaming\Typora\typora-user-images\image-20220523155606625.png" srcset="/img/loading.gif" lazyload alt="image-20220523155606625"></p>
+<h2 id="4、InnoDB对MVCC的实现"><a href="#4、InnoDB对MVCC的实现" class="headerlink" title="4、InnoDB对MVCC的实现"></a>4、InnoDB对MVCC的实现</h2><p>MVCC依赖于</p>
+<ul>
+<li>隐藏字段</li>
+<li>Read View</li>
+<li>undo log</li>
+</ul>
+<p>InnoDB通过对DB_TRX_ID 和Read View 来实现数据的可见性，如果不可见，InnoDB通过DB_ROLL_PTR找到undo log找到历史版本。</p>
+<p><img src="C:\Users\TyanK\AppData\Roaming\Typora\typora-user-images\image-20220523160435387.png" srcset="/img/loading.gif" lazyload alt="image-20220523160435387"></p>
+<p>一行数据的组成。</p>
+<h4 id="Read-View的组成"><a href="#Read-View的组成" class="headerlink" title="Read View的组成"></a>Read View的组成</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">ReadView</span> &#123;</span><br>  <span class="hljs-comment">/* ... */</span><br>private:<br>  <span class="hljs-type">trx_id_t</span> m_low_limit_id;      <span class="hljs-comment">/* 大于等于这个 ID 的事务均不可见 */</span><br><br>  <span class="hljs-type">trx_id_t</span> m_up_limit_id;       <span class="hljs-comment">/* 小于这个 ID 的事务均可见 */</span><br><br>  <span class="hljs-type">trx_id_t</span> m_creator_trx_id;    <span class="hljs-comment">/* 创建该 Read View 的事务ID */</span><br><br>  <span class="hljs-type">trx_id_t</span> m_low_limit_no;      <span class="hljs-comment">/* 事务 Number, 小于该 Number 的 Undo Logs 均可以被 Purge */</span><br><br>  <span class="hljs-type">ids_t</span> m_ids;                  <span class="hljs-comment">/* 创建 Read View 时的活跃事务列表 */</span><br><br>  m_closed;                     <span class="hljs-comment">/* 标记 Read View 是否 close */</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h5 id="数据可见性（RR，RC）"><a href="#数据可见性（RR，RC）" class="headerlink" title="数据可见性（RR，RC）"></a>数据可见性（RR，RC）</h5><p><img src="C:\Users\TyanK\AppData\Roaming\Typora\typora-user-images\image-20220523164000656.png" srcset="/img/loading.gif" lazyload alt="image-20220523164000656"></p>
+<ul>
+<li>m_up_limit_id：目前出现过的最大的TRX_ID + 1</li>
+<li>m_low_limit_id: m_ids里面最小的事务ID</li>
+<li>m_ids ：创建快照时但是没有提交的事务ID列表。</li>
+</ul>
+<p><strong>Read Commited 在每次查询时都会生成Read View，Repeatable Read 只有在创建事务后第一次查询时才创建。</strong></p>
+<p><strong>这就是Repeatable Read 解决不可重复读的关键所在</strong></p>
+<h2 id="SQL语句分类"><a href="#SQL语句分类" class="headerlink" title="SQL语句分类"></a>SQL语句分类</h2><p>:one: DDL (Data Definition Language) 数据定义语言 ， CREATE、DROP、ALTER</p>
+<p>:two: DML (Data Manipulation Language) 数据操纵语言 ，INSERT、UPDATE、DELETE</p>
+<p>:three: DQL (Data Query Language) 数据查询语言 ，SELECT</p>
+<p>:four: DCL (Data Control Language) 数据控制语言，GRANT、REVOKE</p>
+<h2 id="MySQL-45-讲笔记："><a href="#MySQL-45-讲笔记：" class="headerlink" title="MySQL 45 讲笔记："></a>MySQL 45 讲笔记：</h2><h4 id="star-事务的隔离性以及MVCC是如何实现的"><a href="#star-事务的隔离性以及MVCC是如何实现的" class="headerlink" title=":star: 事务的隔离性以及MVCC是如何实现的"></a>:star: 事务的隔离性以及MVCC是如何实现的</h4><p>事务有 Read Committed、Read Uncommitted、Repeatable Read、Serialize 四种级别，其中MySQL默认使用RR。</p>
+<p>RR 为可重复读，意思是在当前事务过程中，所读取到的结果和开始事务之前 的结果是一样的，不会被其他事务修改。</p>
+<p>在RR级别的事务中，每一行数据可以有多个数据版本，并且每个版本都有自己的事务id（trx_id），事务开启时，会创建一个事务id数组，并且完成自己的可见性规则，数组保存的是当前开启了但未提交的事务id，数组里面事务id的最小值就是低水位，当前系统已经创建的事务的最大id+1设为高水位，低于低水位的事务id是在当前事务开启前就已经提交的事务，是可见的，高于高水位的事务id说明是还未启动的事务，不可见，处于两者之间的事务，如果这个trx_id 在这个数组中，就是未提交的事务，是不可见的，如果不在则说明是已经提交了的事务生成的，是可见的。</p>
+<p>但是更新的时候，使用的都是当前读，为了防止修改丢失。</p>
+<h4 id="1、为字符串创建索引（关注区分度）"><a href="#1、为字符串创建索引（关注区分度）" class="headerlink" title="1、为字符串创建索引（关注区分度）"></a>1、为字符串创建索引（关注区分度）</h4><ul>
+<li>直接创建索引 :-1: 占用空间大</li>
+<li>创建前缀索引 :raised_hand:  节省空间，但是会增加扫描次数，并且对覆盖索引有影响。</li>
+<li>倒叙存储并且前缀索引 :+1: ，可以加大字符串区分度，不支持范围扫描。</li>
+<li>创建hash字段索引 :+1: 查询性能稳定，但是会有额外空间和计算消耗，不支持范围扫描。</li>
+</ul>
+<h4 id="2、flush-redo-log-memo"><a href="#2、flush-redo-log-memo" class="headerlink" title="2、flush redo log :memo:"></a>2、flush redo log :memo:</h4><ul>
+<li>redo log 写满了，即writepos 赶上了 checkpoint ，这时候就停下writepos，cp往前flush，刷到磁盘上。</li>
+<li>系统内存满了，内存页不够用，需要换出脏页，刷到磁盘中，</li>
+<li>空闲定时刷盘，有空闲时间就flush</li>
+<li>MySQL正常关闭马，把所有脏页都flush到盘上。</li>
+</ul>
+<h4 id="3、表数据删除但是表文件大小不变-floppy-disk"><a href="#3、表数据删除但是表文件大小不变-floppy-disk" class="headerlink" title="3、表数据删除但是表文件大小不变 :floppy_disk:"></a>3、表数据删除但是表文件大小不变 :floppy_disk:</h4><ul>
+<li>删除表中的数据后，表的结构依然存在，所删除的数据仅仅被标记为删除状态，在内存页中仍然置留着一部分空间，可以用来复用，所以删除数据并不能减小表文件大小。</li>
+<li>所以要缩小文件大小，就需要重建表，因为重建表是按照索引顺序来存储的，这样子的索引就是紧凑的。</li>
+<li>通过 <strong>alter table A engine=InnoDB</strong> 来重建表</li>
+</ul>
+<h4 id="4、count-x-随着数据量变大而变慢"><a href="#4、count-x-随着数据量变大而变慢" class="headerlink" title="4、count(x) 随着数据量变大而变慢"></a>4、count(x) 随着数据量变大而变慢</h4><ul>
+<li>时间为遍历整张表的时间，并且count(主键) \  count(x) 还会取出值判断是否为空，尽量用count(*)，InnoDB开启了事务也不会造成并发问题。</li>
+</ul>
+<h4 id="5、order-by-如何实现的"><a href="#5、order-by-如何实现的" class="headerlink" title="5、order by 如何实现的"></a>5、order by 如何实现的</h4><ul>
+<li>根据二级索引查找到 目标数据，然后通过主键索引查出数据并存入 sort_buffer中，然后进行快排，全字段排序。</li>
+<li>rowid 排序 ，当一行的数据量过大时，sort_buffer 装不下全字段的数据，就从主键索引中取出能填满buffer的主键数据，然后进行排序，排完序后再从主键索引中读取数据，然后依次有序输出，因为过程会回表多，不会被优先使用。</li>
+<li>还有一种不需要排序方法，可以直接创建需要排序字段的联合索引+需要查询的属性字段 形成一个覆盖索引，然后可以直接取出，因为这时候索引是有序的，就不需要排序，需要权衡维护索引和排序哪个更合适当前业务。</li>
+</ul>
+<h4 id="6、MySQL-如何优雅随机取值"><a href="#6、MySQL-如何优雅随机取值" class="headerlink" title="6、MySQL 如何优雅随机取值"></a>6、MySQL 如何优雅随机取值</h4><ul>
+<li>order by rand() limit 3 :-1:   这样就扫描全表了，还会创建临时表，浪费计算资源，limit 走的是rowid排序，然后取前三行。</li>
+<li>随机函数生成一个X，id为主键，X = floor(max(id) - min(id)) *rand() + N，执行三次，:-1: 遇到主键id不紧凑的情况直接寄。</li>
+<li>取得表所有行数 C，Y = floor(C*rand()) ，floor为取下一个整数值，加用limit Y 1 取Y后第一行，执行三次，获取三次Y，:+1:</li>
+</ul>
+<h4 id="7、SQL语句逻辑相同，但执行效率不一样"><a href="#7、SQL语句逻辑相同，但执行效率不一样" class="headerlink" title="7、SQL语句逻辑相同，但执行效率不一样"></a>7、SQL语句逻辑相同，但执行效率不一样</h4><ul>
+<li>可能没有走索引，例如对索引字段使用了函数之类的，但是在输入参数使用函数还是可以走索引的，可以用explain命令来查看语句执行结果。</li>
+<li>隐式类型转换，例如字符串转数字，本身字段是字符串型，但是搜索得条件是int型，就会触发字符串型转换为int型，导致无法使用索引。</li>
+<li>隐式编码转换，多表查询时，如果两个表所使用得编码字符集不一的话，会触发不同字符集之间的自动转换，这就需要调用转型函数，间接触发了第一种情况，如果不能让两个表的编码一致，可以在输入参数上使用编码转换函数，这样还是可以走索引的。</li>
+</ul>
+<h4 id="8、查询语句慢的可能原因"><a href="#8、查询语句慢的可能原因" class="headerlink" title="8、查询语句慢的可能原因"></a>8、查询语句慢的可能原因</h4><ul>
+<li>锁阻塞，等待上一个事务提交完成后才能继续执行。</li>
+<li>等flush，有其他语句在使用当前表，导致flush阻塞，导致查询阻塞。</li>
+<li>两个事务，且查询语句所在的事务用的是一致性读，万一另外一个事务修改了n多次表，本事务就得不断地用undo_log来恢复，给语句加锁让其成为当前读，lock in share mode /  for update</li>
+</ul>
+<h4 id="9、next-key-lock-和-间隙锁"><a href="#9、next-key-lock-和-间隙锁" class="headerlink" title="9、next-key lock 和 间隙锁"></a>9、next-key lock 和 间隙锁</h4><ul>
+<li>next-key lock 是行锁和间隙锁的合称，范围是每两个索引之间的区间，例如(5,10]，(10,15]，是一个左开右闭的区间。间隙锁解决索引区间内的并发插入导致的事务混乱。</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div></div>
+      <div>http://example.com/2022/10/14/MySQL面试/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>TyanK</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年10月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/10/14/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%AC%94%E8%AE%B0/" title="">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/10/14/JVM%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" title="">
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

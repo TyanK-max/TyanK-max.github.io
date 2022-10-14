@@ -16,21 +16,27 @@
   <meta name="author" content="TyanK">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+    <meta name="description" content="计算机网络笔记[TOC] 1、HTTP协议1.1 概念超文本传输协议 经典状态码  304：发送请求资源时，比对当前客户端的缓存资源是否修改，如果没变，则重定向到缓存资源，改了则返回200 1.2 常见字段 + 经典参数 Host 指定服务器域名 （www.xxxx.com） Content-length 表面本次返回数据的长度 （1000） Connection 客户端要求服务端TCP持久连接，">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://example.com/2022/10/14/hello-world/index.html">
+<meta property="og:title" content="后端工程笔记">
+<meta property="og:url" content="http://example.com/2022/10/14/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="后端工程笔记">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="计算机网络笔记[TOC] 1、HTTP协议1.1 概念超文本传输协议 经典状态码  304：发送请求资源时，比对当前客户端的缓存资源是否修改，如果没变，则重定向到缓存资源，改了则返回200 1.2 常见字段 + 经典参数 Host 指定服务器域名 （www.xxxx.com） Content-length 表面本次返回数据的长度 （1000） Connection 客户端要求服务端TCP持久连接，">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-10-14T08:01:07.945Z">
-<meta property="article:modified_time" content="2022-10-14T07:59:06.561Z">
+<meta property="og:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/HTTP/6-%E4%BA%94%E5%A4%A7%E7%B1%BBHTTP%E7%8A%B6%E6%80%81%E7%A0%81.png">
+<meta property="og:image" content="https://img-blog.csdnimg.cn/d92026ce085b401c95cf02b7ce9b7fae.png">
+<meta property="og:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/http2/%E9%9D%99%E6%80%81%E5%A4%B4%E9%83%A82.png">
+<meta property="og:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/http2/%E5%B8%A7%E6%A0%BC%E5%BC%8F.png">
+<meta property="og:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/http2/stream2.png">
+<meta property="article:published_time" content="2022-10-14T14:03:38.384Z">
+<meta property="article:modified_time" content="2022-05-12T15:36:30.662Z">
 <meta property="article:author" content="TyanK">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/HTTP/6-%E4%BA%94%E5%A4%A7%E7%B1%BBHTTP%E7%8A%B6%E6%80%81%E7%A0%81.png">
   
   
   
-  <title>Hello World - 后端工程笔记</title>
+  <title>后端工程笔记</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -171,7 +177,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Hello World"></span>
+            <span id="subtitle" data-typed-text=""></span>
           
         </div>
 
@@ -182,8 +188,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-10-14 16:01" pubdate>
-          2022年10月14日 下午
+        <time datetime="2022-10-14 22:03" pubdate>
+          2022年10月14日 晚上
         </time>
       </span>
     
@@ -194,7 +200,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          367 字
+          2.2k 字
         
       </span>
     
@@ -205,7 +211,7 @@
         
         
         
-          4 分钟
+          19 分钟
         
       </span>
     
@@ -243,24 +249,85 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Hello World</h1>
+            <h1 style="display: none"></h1>
             
             
               <div class="markdown-body">
                 
-                <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+                <h1 id="计算机网络笔记"><a href="#计算机网络笔记" class="headerlink" title="计算机网络笔记"></a>计算机网络笔记</h1><p>[TOC]</p>
+<h2 id="1、HTTP协议"><a href="#1、HTTP协议" class="headerlink" title="1、HTTP协议"></a>1、HTTP协议</h2><h3 id="1-1-概念"><a href="#1-1-概念" class="headerlink" title="1.1 概念"></a>1.1 概念</h3><p>超文本传输协议</p>
+<p><strong>经典状态码</strong></p>
+<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/HTTP/6-%E4%BA%94%E5%A4%A7%E7%B1%BBHTTP%E7%8A%B6%E6%80%81%E7%A0%81.png" srcset="/img/loading.gif" lazyload alt=" 五大类 HTTP 状态码 "></p>
+<p>304：发送请求资源时，比对当前客户端的缓存资源是否修改，如果没变，则重定向到缓存资源，改了则返回200</p>
+<h3 id="1-2-常见字段-经典参数"><a href="#1-2-常见字段-经典参数" class="headerlink" title="1.2 常见字段 + 经典参数"></a>1.2 常见字段 + 经典参数</h3><ul>
+<li>Host 指定服务器域名 （<a target="_blank" rel="noopener" href="http://www.xxxx.com)/">www.xxxx.com）</a></li>
+<li>Content-length 表面本次返回数据的长度 （1000）</li>
+<li>Connection 客户端要求服务端TCP持久连接，以便请求复用 （keep-alive）</li>
+<li>Content-Type 告诉客户端本次数据是什么格式 （text/html;charset=utf-8)</li>
+<li>Content-Encoding 说明数据压缩的方法 （gzip）</li>
+<li>Accept-Encoding 客户端说明自己接受什么样的压缩方法</li>
+</ul>
+<h2 id="2、GET和POST"><a href="#2、GET和POST" class="headerlink" title="2、GET和POST"></a>2、GET和POST</h2><h3 id="2-1、概念"><a href="#2-1、概念" class="headerlink" title="2.1、概念"></a>2.1、概念</h3><ul>
+<li>GET 从服务器获取资源，安全切幂等（不会修改资源，并且每次结果都相同）</li>
+<li>POST 根据请求负荷对指定资源做出处理，不安全不幂等（会修改服务器上的资源，多次提交会创建多个资源）</li>
+</ul>
+<h2 id="3、HTTP缓存"><a href="#3、HTTP缓存" class="headerlink" title="3、HTTP缓存"></a>3、HTTP缓存</h2><h3 id="3-1-强制缓存"><a href="#3-1-强制缓存" class="headerlink" title="3.1 强制缓存"></a>3.1 强制缓存</h3><p>判断浏览器缓存过没过期，没过期直接使用浏览器本地缓存，浏览器具有主动性</p>
+<p><strong>依赖两个头部</strong></p>
+<ul>
+<li>Cache-Control 相对时间</li>
+<li>Expires 绝对时间</li>
+</ul>
+<p>Cache-Control 优先级高于 Expires</p>
+<p>浏览器第一次请求访问服务器，会返回一个响应头中带有Cache-Control ，设置了过期时间。</p>
+<p>服务器若再次收到请求，会更新响应头中的Cache-Control</p>
+<h3 id="3-2-协商缓存"><a href="#3-2-协商缓存" class="headerlink" title="3.2 协商缓存"></a>3.2 协商缓存</h3><p><strong>两个头部</strong></p>
+<p>1、</p>
+<ul>
+<li>响应头中的 Last-Modified 资源最后一次修改时间</li>
+<li>请求头中的 If-Modified-Since 若收到的响应头中有Last-Modified，再次发送时带上这个Last-Modified，与被请求资源的Last-Modified对比，如果大于，则说明过期，小于则返回304告诉你走本地缓存。</li>
+</ul>
+<p>2、</p>
+<ul>
+<li>响应头 If-None-Match  当本地缓存发现过期时，响应头里还有eTag ，则再次带上eTag请求一遍，与服务器资源的eTag对比，没变则返回304，变了返回200</li>
+<li>请求头 eTag  唯一表示资源版本标识</li>
+</ul>
+<p><img src="https://img-blog.csdnimg.cn/d92026ce085b401c95cf02b7ce9b7fae.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h2 id="4、HTTP-2-优化在哪"><a href="#4、HTTP-2-优化在哪" class="headerlink" title="4、HTTP/2 优化在哪"></a>4、HTTP/2 优化在哪</h2><p>HTTP/2 对报文的header部分做了改造，不使用以前的gzip来压缩头部，使用HPACK算法。</p>
+<p>HPACK组成：</p>
+<ul>
+<li>静态表</li>
+<li>动态表</li>
+<li>Huffman编码</li>
+</ul>
+<h3 id="4-1-静态表"><a href="#4-1-静态表" class="headerlink" title="4.1 静态表"></a>4.1 静态表</h3><p>静态表是写在HTTP/2 框架中的表，有61中常出现的头部，比如method，server，path等，发送http2 报文头部可以压缩成二进制表示。</p>
+<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/http2/%E9%9D%99%E6%80%81%E5%A4%B4%E9%83%A82.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h3 id="4-2-动态表"><a href="#4-2-动态表" class="headerlink" title="4.2 动态表"></a>4.2 动态表</h3><p>不属于那61个常用头部的头部，就需要服务端自己创建动态表，将新出现的头部接着61加下去，下一个就是62，下一次客户端发送这个头部的时候，就不需要重复发这个字段，只需要发index服务端就可以查到是哪个头部了。</p>
+<p><strong>所以，必须要在同一个连接上，重复传输完全相同的http头部，这个功能才能发挥作用</strong>，当然避免动态表过于庞大，请求数量到达上限时就会关闭http连接，示范内存。</p>
+<h3 id="4-3-二进制帧"><a href="#4-3-二进制帧" class="headerlink" title="4.3 二进制帧"></a>4.3 二进制帧</h3><p>HTTP/2 性能提升最大的还是数据的改变，HTTP 1使用文本传输，HTTP2直接使用二进制数据传输，大大提高了服务端的解析效率。</p>
+<p>HTTP/2 把响应报文划分成两个帧，头部帧和数据帧，每个帧的结构如下</p>
+<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/http2/%E5%B8%A7%E6%A0%BC%E5%BC%8F.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<p>后面的帧数据则是使用HPACK算法压缩的数据。</p>
+<h3 id="4-4-并发Stream-传输"><a href="#4-4-并发Stream-传输" class="headerlink" title="4.4 并发Stream 传输"></a>4.4 并发Stream 传输</h3><p>HTTP/2 使用stream达到并发传输的目的，多个stream复用一个TCP连接，不像HTTP/1.1 那样纯靠多个TCP连接堆起来实现并发。每个Stream 都有StreamID 这个ID时后续为两端提供有序组装的消息，所以Stream可以乱序发送，但是一个Stream里面的帧必须是有序的。</p>
+<p>客户端发送的StreamID必须是奇数，服务端是偶数。</p>
+<p><img src="https://cdn.xiaolincoding.com/gh/xiaolincoder/ImageHost4@main/%E7%BD%91%E7%BB%9C/http2/stream2.png" srcset="/img/loading.gif" lazyload alt="img"></p>
+<h3 id="4-5-服务器主动推送资源"><a href="#4-5-服务器主动推送资源" class="headerlink" title="4.5 服务器主动推送资源"></a>4.5 服务器主动推送资源</h3><p>客户端请求一个数据，服务端则会把这个数据包括以后可能会使用上的其他的数据发给他，顺带上的是以一个PUSH_PROMISE帧，告诉客户端接下来哪个Stream发送资源，</p>
+<h2 id="5、TCP协议"><a href="#5、TCP协议" class="headerlink" title="5、TCP协议"></a>5、TCP协议</h2><p>TCP 是一个面向连接，可靠的，基于字节流的传输层通信协议。</p>
+<h3 id="5-1-TCP-三次握手"><a href="#5-1-TCP-三次握手" class="headerlink" title="5.1 TCP 三次握手"></a>5.1 TCP 三次握手</h3><ul>
+<li>服务端主动监听某个端口</li>
+<li>客户端初始化序号 client_isn，放在TCP首部的序号字段中，并把SYN标志位置为1，接着就发给服务端，这次报文不带有应用层数据，之后客户端处于 SYN_SENT状态</li>
+<li>服务端收到SYN报文后，也初始化自己的序号 server_isn ，填入当前TCP报文首部的序号字段，在确认应答号字段填入 client_isn+1，接着把SYN和ACK标志位置为1，然后发回给客户端，此报文也不带应用层数据。</li>
+<li>客户端收到返回的报文后，ACK标志位置为1，在确认应答号填入 server_isn+1，此次可以携带应用层数据，然后发给服务端，处于ESTABLISHED 状态</li>
+<li>服务端收到应答报文后，进入ESTABLISHED 状态。</li>
+</ul>
+<h3 id="5-2-为什么要三次握手"><a href="#5-2-为什么要三次握手" class="headerlink" title="5.2 为什么要三次握手"></a>5.2 为什么要三次握手</h3><p>三个原因：</p>
+<ul>
+<li><strong>三次握手才可以阻止重复历史连接的初始化</strong></li>
+<li>三次握手才能同步双方初始序列号</li>
+<li>三次握手避免资源浪费</li>
+</ul>
+<h4 id="组织历史连接初始化"><a href="#组织历史连接初始化" class="headerlink" title="组织历史连接初始化"></a>组织历史连接初始化</h4><p>首要原因是为了防止旧的重复连接初始化造成混乱，如果只是一来一回就建立好了连接，那么如果第一次握手阻塞的话，即是历史连接，那么后来新的连接会受到这个历史连接的影响，例如老的比新的先到服务端的期望ack 值以及不是历史期望，就会把当前这个连接中断作废，导致资源浪费或者建立多的无用且冗余连接。</p>
+<p><strong>初始化序列号</strong></p>
+<p>每次连接初始化的序列号必须不同。</p>
 
                 
               </div>
@@ -278,8 +345,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Hello World</div>
-      <div>http://example.com/2022/10/14/hello-world/</div>
+      <div></div>
+      <div>http://example.com/2022/10/14/计算机网络笔记/</div>
     </div>
     <div class="license-meta">
       
@@ -323,15 +390,15 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/10/14/Java%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%AC%94%E8%AE%B0/" title="">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile"></span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
+                    
+                      <a href="/2022/10/14/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%AC%94%E8%AE%B0/" title="">
+                        <span class="hidden-mobile"></span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
                     
                   </article>
                 </div>
