@@ -27,7 +27,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/img/Java_JVM_index.png">
 <meta property="article:published_time" content="2022-10-14T14:03:24.768Z">
-<meta property="article:modified_time" content="2022-10-15T06:42:48.979Z">
+<meta property="article:modified_time" content="2022-10-15T06:54:38.676Z">
 <meta property="article:author" content="TyanK">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://example.com/img/Java_JVM_index.png">
@@ -266,7 +266,7 @@
 <h3 id="1-4-堆"><a href="#1-4-堆" class="headerlink" title="1.4 堆"></a>1.4 堆</h3><p>JVM所管理的内存中最大的一块，是所有线程共享的一块内存区域，在JVM启动时创建。<strong>唯一目的就是存放对象实例，几乎所有的对象实例和数组都在这里分配内存</strong>。GC垃圾回收的主要区域就是堆。</p>
 <p>按照分代垃圾回收算法可以把堆再细分 ==新生代==，==老年代==，==永久代（元空间）==。</p>
 <p>Eden（伊甸区），Survivor 幸存者区 (S0,S1) ，都属于新生代。</p>
-<p><img src="img/hotspot-heap-structure.png" srcset="/img/loading.gif" lazyload alt="hotspot-heap-structure"></p>
+<p><img src="/img/hotspot-heap-structure.png" srcset="/img/loading.gif" lazyload alt="hotspot-heap-structure"></p>
 <p>元空间使用的是直接内存。</p>
 <p>对象的流程：</p>
 <p>刚开始创建对象实在Eden区，第一次垃圾回收如果对象还存在的话就会下下放到幸存者区S0或S1，并且对象年龄+1，当年龄加到一定阈值时（15），就会放到老年代中。</p>
@@ -320,7 +320,7 @@
 <p>利用可达性分析标记存活对象和垃圾对象，将所有存活的对象向一段移动，将段外面的所有对象回收，不会产生空间碎片。</p>
 <p>复制算法:</p>
 <p>​    分代收集算法：根据内存对象的存活周期不同，将内存划分成几块，java虚拟机一般将内存分成新生代和老生代，在新生代中，有大量对象死去和少量对象存活，所以采用复制算法，只需要付出少量存活对象的复制成本就可以完成收集；老年代中因为对象的存活率极高，没有额外的空间对他进行分配担保，所以采用标记清理或者标记整理算法进行回收</p>
-<p><img src="img/JVM-clean.png" srcset="/img/loading.gif" lazyload alt="image-20210329224002527"></p>
+<p><img src="/img/JVM-clean.png" srcset="/img/loading.gif" lazyload alt="image-20210329224002527"></p>
 <h3 id="1-9-类加载器"><a href="#1-9-类加载器" class="headerlink" title="1.9 类加载器"></a>1.9 类加载器</h3><p>JVM 中内置了三个重要的 ClassLoader，除了 BootstrapClassLoader 其他类加载器均由 Java 实现且全部继承自<code>java.lang.ClassLoader</code>：</p>
 <ol>
 <li><strong>BootstrapClassLoader(启动类加载器)</strong> ：最顶层的加载类，由 C++实现，负责加载 <code>%JAVA_HOME%/lib</code>目录下的 jar 包和类或者被 <code>-Xbootclasspath</code>参数指定的路径中的所有类。</li>
