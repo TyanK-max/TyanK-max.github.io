@@ -1,4 +1,4 @@
-<link rel="stylesheet" class="aplayer-secondary-style-marker" href="\assets\css\APlayer.min.css"><script src="\assets\js\APlayer.min.js" class="aplayer-secondary-script-marker"></script>!(function() {
+!(function() {
   /** 计时起始时间，自行修改 **/
   var start = new Date("2022/10/14 00:00:00");
 
@@ -22,7 +22,7 @@
     if(String(snum).length === 1 ){
       snum = "0" + snum;
     }
-    document.getElementById("timeDate").innerHTML = "🚀 &nbsp已起飞"+dnum+"&nbsp天";
+    document.getElementById("timeDate").innerHTML = "🚀 &nbsp已起飞&nbsp"+dnum+"&nbsp天";
     document.getElementById("times").innerHTML = hnum + "&nbsp小时&nbsp" + mnum + "&nbsp分&nbsp" + snum + "&nbsp秒";
   }
 
